@@ -44,6 +44,10 @@
   "column_break_fzef",
   "ticket_routing_section",
   "auto_set_customer_from_contact",
+  "sla_monitor_section",
+  "sla_warning_threshold",
+  "column_break_slam",
+  "sla_monitor_refresh_interval",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -551,12 +555,36 @@
    "fieldname": "auto_set_customer_from_contact",
    "fieldtype": "Check",
    "label": "Auto-set customer from contact"
+  },
+  {
+   "fieldname": "sla_monitor_section",
+   "fieldtype": "Section Break",
+   "label": "SLA Monitor"
+  },
+  {
+   "default": "75",
+   "description": "Raise an escalation warning once this percentage of the SLA window (first response or resolution) has been used.",
+   "fieldname": "sla_warning_threshold",
+   "fieldtype": "Percent",
+   "label": "Escalation warning threshold (%)"
+  },
+  {
+   "fieldname": "column_break_slam",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "60",
+   "description": "How often the SLA Monitor page reloads its data. Set 0 to disable auto refresh.",
+   "fieldname": "sla_monitor_refresh_interval",
+   "fieldtype": "Int",
+   "label": "SLA Monitor refresh interval (seconds)",
+   "non_negative": 1
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-02 15:54:13.209685",
+ "modified": "2026-11-24 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
