@@ -101,6 +101,7 @@ def get_list_data(
 
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
+    handle_search_filter(filters, doctype)
 
     if rows is None:
         rows = []
@@ -682,3 +683,99 @@ def remove_assignments(doctype: str, name: str, assignees: list[str]):
             assign_to=assign_to,
             status="Cancelled",
         )
+
+
+SEARCH_FILTER = "__search"
+
+
+def handle_search_filter(filters, doctype):
+    """
+    Handle the custom __search filter: a free-text term matched with LIKE
+    against the doctype's name, title field and search fields (for HD Ticket:
+    ID, subject, status and raised by). The matches are merged into the
+    filters in place as a name filter, like __assigned_on, since a list of
+    AND-ed filters can't express "any of these fields".
+    """
+    search_filter = _pop_custom_filter(filters, SEARCH_FILTER)
+    if search_filter is None:
+        return
+
+    term = search_filter[1] if isinstance(search_filter, list) else search_filter
+    term = str(term or "").strip().strip("%").strip()
+    if not term:
+        return
+
+    like = f"%{term}%"
+    or_filters = [[field, "like", like] for field in get_search_fields(doctype)]
+    names = frappe.get_list(doctype, or_filters=or_filters, pluck="name", limit=0)
+    _merge_search_names(filters, names)
+
+
+def get_search_fields(doctype) -> list[str]:
+    meta = frappe.get_meta(doctype)
+    fields = ["name"]
+    if meta.title_field:
+        fields.append(meta.title_field)
+    for field in (meta.search_fields or "").split(","):
+        field = field.strip()
+        if field and meta.has_field(field):
+            fields.append(field)
+    return list(dict.fromkeys(fields))
+
+
+def _pop_custom_filter(filters, fieldname):
+    """Remove a custom (non-column) filter and return its [operator, value]."""
+    if isinstance(filters, dict):
+        return filters.pop(fieldname, None)
+    condition = next(
+        (
+            condition
+            for condition in filters
+            if isinstance(condition, list) and condition and condition[0] == fieldname
+        ),
+        None,
+    )
+    if condition is None:
+        return None
+    filters.remove(condition)
+    return [condition[1], condition[2]] if len(condition) >= 3 else None
+
+
+def _merge_search_names(filters, names):
+    """AND the matched names with any existing `name in (...)` filter."""
+    if isinstance(filters, dict):
+        existing = filters.get("name")
+        if isinstance(existing, list) and str(existing[0]).lower() == "in":
+            names = list(set(names) & set(existing[1]))
+        filters["name"] = ["in", names]
+        return
+    existing = next(
+        (
+            condition
+            for condition in filters
+            if isinstance(condition, list)
+            and len(condition) >= 3
+            and condition[0] == "name"
+            and str(condition[1]).lower() == "in"
+        ),
+        None,
+    )
+    if existing:
+        existing[2] = list(set(names) & set(existing[2]))
+    else:
+        filters.append(["name", "in", names])
+
+
+@frappe.whitelist()
+@frappe.read_only()
+def export_list(doctype: str, filters: str | list | dict | None = None):
+    """`export_query` for a list view, with Helpdesk's custom filters (`@me`,
+    `__assigned_on`, `__search`) resolved first, as in `get_list_data`."""
+    from frappe.desk.reportview import export_query
+
+    filters = frappe.parse_json(filters) or []
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
+    handle_search_filter(filters, doctype)
+    frappe.form_dict.update(doctype=doctype, filters=filters)
+    return export_query()

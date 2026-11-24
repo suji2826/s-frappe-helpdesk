@@ -9,7 +9,7 @@ from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
 
-from helpdesk.api.doc import handle_at_me_support
+from helpdesk.api.doc import handle_at_me_support, handle_search_filter
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.ticket_fields import TicketFields
@@ -431,6 +431,8 @@ def get_navigation_filters(ticket: str, current_view: str = None):
     conditions = _to_conditions(_get_view_filters(current_view))
     # Custom filter "__assigned_on" is not available in any doctype
     conditions = [c for c in conditions if c[0] != "__assigned_on"]
+    # "__search" is resolved to matching ticket names, like in the list view
+    handle_search_filter(conditions, "HD Ticket")
     conditions.append(["name", "!=", ticket])
     return handle_at_me_support(conditions)
 
