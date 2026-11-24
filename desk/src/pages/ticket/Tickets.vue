@@ -28,6 +28,11 @@
         </RouterLink>
       </template>
     </LayoutHeader>
+    <TicketListFilters
+      v-if="!isMobileView"
+      :filters="listViewRef?.list?.params?.filters"
+      @apply="(conditions) => listViewRef?.applyFilters(conditions)"
+    />
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
@@ -78,6 +83,8 @@ import BulkAssignModal from "@/components/ticket-agent/BulkAssignModal.vue";
 import BulkEditModal from "@/components/ticket-agent/BulkEditModal.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
+import TicketListFilters from "@/components/ticket-agent/TicketListFilters.vue";
+import { useScreenSize } from "@/composables/screen";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import { normalizeFilters } from "@/components/view-controls/filter";
 import ViewModal from "@/components/ViewModal.vue";
@@ -112,6 +119,7 @@ const hasActiveFilters = computed(
 );
 
 const { $socket } = globalStore();
+const { isMobileView } = useScreenSize();
 const { isManager, userId } = useAuthStore();
 
 const listViewRef = ref(null);
@@ -340,7 +348,9 @@ async function exportRows(
   }
   const filters = JSON.stringify(conditions);
 
-  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${encodeURIComponent(
+  // Helpdesk's wrapper around export_query resolves custom filters such as
+  // `__search` and `__assigned_on`, which are not real HD Ticket columns.
+  window.location.href = `/api/method/helpdesk.api.doc.export_list?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${encodeURIComponent(
     filters
   )}&order_by=${order_by}&page_length=${pageLength}&start=0&view=Report&with_comment_count=1`;
   reset();

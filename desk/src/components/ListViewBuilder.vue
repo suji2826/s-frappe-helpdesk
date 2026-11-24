@@ -414,6 +414,8 @@ const list = createResource({
 const exposeFunctions = {
   list,
   reload,
+  // lets a page drive the filters from its own controls (e.g. the ticket filter bar)
+  applyFilters: (filters) => applyFilters(filters),
   unselectAll: () => {},
 };
 
