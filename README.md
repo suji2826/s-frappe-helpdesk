@@ -1,3 +1,5 @@
+> **Internship submission (Sujitha S):** see [IMPLEMENTATION.md](IMPLEMENTATION.md) for setup, database structure, the ticket list filters, the SLA Monitor and challenges.
+
 <div align="center" markdown="1">
 
 <img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="80"/>

@@ -196,3 +196,17 @@ _Add these to `docs/screenshots/`:_
 2. The SLA Monitor overview (banner, tiles, colour-coded table)
 3. An At Risk ticket with its escalation warning
 4. HD Settings → SLA Monitor section
+
+### Captured screenshots
+
+**Ticket list with the new filter bar**
+
+![Ticket list filters](docs/screenshots/1-ticket-filters.png)
+
+**SLA Monitor: escalation banner, state tiles and colour indicators**
+
+![SLA Monitor](docs/screenshots/2-sla-monitor.png)
+
+**Overdue and At Risk tickets with escalation warnings**
+
+![Escalation warning](docs/screenshots/3-escalation-warning.png)
