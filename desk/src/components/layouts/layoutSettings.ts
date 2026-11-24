@@ -2,6 +2,7 @@ import { ref } from "vue";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideUsers from "~icons/lucide/users";
 import LucideTicket from "~icons/lucide/ticket";
+import LucideTimer from "~icons/lucide/timer";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
@@ -29,6 +30,11 @@ export const agentPortalSidebarOptions = [
     label: __("Tickets"),
     icon: LucideTicket,
     to: "TicketsAgent",
+  },
+  {
+    label: __("SLA Monitor"),
+    icon: LucideTimer,
+    to: "SlaMonitor",
   },
   {
     label: __("Knowledge Base"),

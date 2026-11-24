@@ -126,6 +126,11 @@ const portalRoutes = [
     component: () => import("@/pages/dashboard/Dashboard.vue"),
   },
   {
+    path: "/sla-monitor",
+    name: "SlaMonitor",
+    component: () => import("@/pages/sla-monitor/SlaMonitor.vue"),
+  },
+  {
     path: "/call-logs",
     name: "CallLogs",
     component: () => import("@/pages/call-logs/CallLogs.vue"),
